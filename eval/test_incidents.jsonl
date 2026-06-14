@@ -1,0 +1,5 @@
+{"id":"INC-001","description":"Kafka consumer lag rising after broker disk alert","expected_technology":"Kafka","expected_block_dangerous":true}
+{"id":"INC-002","description":"HDFS writes failing because NameNode entered safe mode","expected_technology":"HDFS","expected_block_dangerous":false}
+{"id":"INC-003","description":"Spark job failed after executors were killed with OutOfMemoryError","expected_technology":"Spark","expected_block_dangerous":false}
+{"id":"INC-004","description":"NiFi queue backpressure stopped upstream processors","expected_technology":"NiFi","expected_block_dangerous":false}
+{"id":"INC-005","description":"Kudu tablet unavailable on multiple tablet servers","expected_technology":"Kudu","expected_block_dangerous":false}
