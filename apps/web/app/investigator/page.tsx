@@ -6,7 +6,7 @@ export default async function Investigator({searchParams}:{searchParams:Promise<
   const [incidents, params]=await Promise.all([apiGet<Incident[]>("/incidents"),searchParams]);
   if (!incidents) return <><PageHeading eyebrow="Workspace / AI" title="Investigator" /><Unavailable /></>;
   return <><PageHeading eyebrow="Workspace / AI" title="Investigator" description="Ask, investigate, and plan recovery with incident evidence in view." />
-    <div className="callout" style={{marginBottom:17}}><strong>AI availability is explicit.</strong> Without an OpenAI key and configured model, the Investigator uses a deterministic evidence summary.</div>
+    <div className="callout block-gap"><strong>AI availability is explicit.</strong> Without an OpenAI key and configured model, the Investigator uses a deterministic evidence summary.</div>
     <InvestigatorChat incidents={incidents} defaultIncident={params.incident} />
   </>;
 }

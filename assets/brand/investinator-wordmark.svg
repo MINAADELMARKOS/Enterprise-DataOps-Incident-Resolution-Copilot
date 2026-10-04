@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 48" role="img" aria-labelledby="title">
   <title id="title">InvestiNator wordmark</title>
-  <rect x="2" y="2" width="44" height="44" rx="9" fill="#0E1A2A"/>
-  <circle cx="23" cy="22" r="11" fill="none" stroke="#3CE6C1" stroke-width="3"/>
-  <path d="m31 30 10 10" stroke="#3CE6C1" stroke-width="3" stroke-linecap="round"/>
-  <path d="M12 22h7l3-5 4 10 3-5h6" fill="none" stroke="#F4F7FB" stroke-width="2"/>
-  <text x="58" y="31" fill="#F4F7FB" font-family="Inter, Arial, sans-serif" font-weight="700" font-size="25" letter-spacing="-.7">InvestiNator</text>
+  <path d="M10 2H38L46 10V38L38 46H10L2 38V10Z" fill="#12121A"/>
+  <circle cx="23" cy="22" r="11" fill="none" stroke="#00FF88" stroke-width="3"/>
+  <path d="m31 30 10 10" stroke="#00FF88" stroke-width="3" stroke-linecap="round"/>
+  <path d="M12 22h7l3-5 4 10 3-5h6" fill="none" stroke="#E0E0E0" stroke-width="2"/>
+  <text x="58" y="31" fill="#E0E0E0" font-family="Orbitron, monospace" font-weight="700" font-size="25" letter-spacing="-.7">InvestiNator</text>
 </svg>

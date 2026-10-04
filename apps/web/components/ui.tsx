@@ -1,12 +1,15 @@
 import Link from "next/link";
 import type { Incident } from "@/lib/api";
 
-export function PageHeading({ eyebrow, title, description, action }: { eyebrow: string; title: string; description?: string; action?: React.ReactNode }) {
-  return <div className="page-heading"><div><div className="eyebrow">{eyebrow}</div><h1>{title}</h1>{description && <p>{description}</p>}</div>{action && <div className="heading-action">{action}</div>}</div>;
+export function PageHeading({ eyebrow, title, description, action, hero = false }: { eyebrow: string; title: string; description?: string; action?: React.ReactNode; hero?: boolean }) {
+  return <div className={`page-heading${hero ? " page-heading-hero" : ""}`}><div><div className="eyebrow">{eyebrow}</div><h1 className={hero ? "cyber-glitch" : undefined} data-text={hero ? title : undefined} aria-label={hero ? title : undefined}>{title}</h1>{description && <p>{description}</p>}</div>{action && <div className="heading-action">{action}</div>}</div>;
 }
 
-export function Panel({ title, detail, children, className = "" }: { title: string; detail?: string; children: React.ReactNode; className?: string }) {
-  return <section className={`panel ${className}`}><div className="panel-heading"><h2>{title}</h2>{detail && <span>{detail}</span>}</div>{children}</section>;
+export function Panel({ title, detail, children, className = "", variant = "default", hoverEffect = false }: { title: string; detail?: string; children: React.ReactNode; className?: string; variant?: "default" | "terminal" | "holographic"; hoverEffect?: boolean }) {
+  return <section className={`panel panel-${variant}${hoverEffect ? " panel-hover" : ""} ${className}`}>
+    {variant === "terminal" && <div className="terminal-chrome" aria-hidden="true"><span /><span /><span /><i>INVESTINATOR://OPS</i></div>}
+    <div className="panel-heading"><h2>{title}</h2>{detail && <span>{detail}</span>}</div>{children}
+  </section>;
 }
 
 export function Badge({ children, tone = "neutral" }: { children: React.ReactNode; tone?: "critical" | "warning" | "success" | "info" | "neutral" }) {

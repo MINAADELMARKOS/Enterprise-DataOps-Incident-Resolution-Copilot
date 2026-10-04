@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
   <title id="title">InvestiNator mark</title>
-  <rect width="64" height="64" rx="12" fill="#0E1A2A"/>
-  <circle cx="29" cy="29" r="17" fill="none" stroke="#3CE6C1" stroke-width="4"/>
-  <path d="M41.5 41.5 54 54" stroke="#3CE6C1" stroke-width="4" stroke-linecap="round"/>
-  <path d="M14 30h9l4-7 5 13 4-6h8" fill="none" stroke="#F4F7FB" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-  <circle cx="23" cy="30" r="2.5" fill="#3CE6C1"/><circle cx="36" cy="30" r="2.5" fill="#3CE6C1"/>
+  <path d="M10 0H54L64 10V54L54 64H10L0 54V10Z" fill="#12121A"/>
+  <circle cx="29" cy="29" r="17" fill="none" stroke="#00FF88" stroke-width="4"/>
+  <path d="M41.5 41.5 54 54" stroke="#00FF88" stroke-width="4" stroke-linecap="round"/>
+  <path d="M14 30h9l4-7 5 13 4-6h8" fill="none" stroke="#E0E0E0" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="23" cy="30" r="2.5" fill="#00FF88"/><circle cx="36" cy="30" r="2.5" fill="#00FF88"/>
 </svg>

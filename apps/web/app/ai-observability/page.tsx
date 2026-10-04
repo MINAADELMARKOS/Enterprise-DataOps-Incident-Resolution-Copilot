@@ -5,7 +5,7 @@ type Usage={model_calls:number;input_tokens:number;output_tokens:number;failures
 type Evaluation={id:string;replay_id:string;score:number;detection:boolean;correlation:boolean;verification:boolean};
 export default async function AIObservability(){const [usage,evaluations]=await Promise.all([apiGet<Usage>("/ai/usage"),apiGet<Evaluation[]>("/evaluations")]);if(!usage||!evaluations)return <><PageHeading eyebrow="Platform / AI" title="AI Observability" /><Unavailable /></>;
   return <><PageHeading eyebrow="Platform / AI" title="AI Observability" description="Model usage, failures and replay evaluations, with no fabricated AI scores." />
-    <div className="grid grid-4" style={{marginBottom:17}}>
+    <div className="grid grid-4 block-gap">
       <div className="stat-card"><span className="stat-label">Model calls</span><strong>{usage.model_calls}</strong><span className="stat-foot">{usage.mode}</span></div>
       <div className="stat-card"><span className="stat-label">Input tokens</span><strong>{usage.input_tokens.toLocaleString()}</strong><span className="stat-foot">Recorded usage</span></div>
       <div className="stat-card"><span className="stat-label">Output tokens</span><strong>{usage.output_tokens.toLocaleString()}</strong><span className="stat-foot">Recorded usage</span></div>

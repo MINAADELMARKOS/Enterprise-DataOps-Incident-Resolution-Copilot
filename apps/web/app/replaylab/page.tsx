@@ -8,7 +8,7 @@ export default async function ReplayLab(){
   const [scenarios,runs]=await Promise.all([apiGet<Scenario[]>("/replay/scenarios"),apiGet<Run[]>("/replay/runs")]);
   if(!scenarios||!runs)return <><PageHeading eyebrow="Operations / Simulation" title="ReplayLab" /><Unavailable /></>;
   return <><PageHeading eyebrow="Operations / Simulation" title="ReplayLab" description="Run repeatable fault scenarios through detection, correlation, investigation and verification." />
-    <div className="callout callout-warning" style={{marginBottom:17}}><strong>Simulated fault injection.</strong> These runs change backend demo telemetry. They do not change a live Kafka broker, Spark job, or production dataset.</div>
+    <div className="callout callout-warning block-gap"><strong>Simulated fault injection.</strong> These runs change backend demo telemetry. They do not change a live Kafka broker, Spark job, or production dataset.</div>
     <ReplayControls scenarios={scenarios} runs={runs} />
   </>;
 }

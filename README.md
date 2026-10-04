@@ -18,6 +18,8 @@ InvestiNator follows a signal across infrastructure, pipelines, and datasets, ga
 | ReplayLab and evaluation | Three replay scenarios, saved run/evaluation records, offline regression dataset | Scenario results describe demo behavior only |
 | Interface | Next.js Command Center, Pulse, Incident Room, Investigator, NerveMap, ReplayLab, Approvals, Knowledge, AI Observability and more | Demo identity is fixed server-side; OIDC/RBAC is not implemented |
 
+The dark interface uses a shared [cyberpunk design system](docs/design-system.md) with accessible neon controls, terminal panels, and responsive layouts.
+
 ## Run the full demo
 
 Requires Docker Desktop with its engine running. From the repository root:

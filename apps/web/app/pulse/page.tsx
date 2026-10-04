@@ -12,7 +12,7 @@ export default async function Pulse() {
   const data = await apiGet<{items: Metric[]; mode: string}>("/telemetry/metrics");
   if (!data) return <><PageHeading eyebrow="Workspace / Observability" title="Pulse" /><Unavailable /></>;
   return <><PageHeading eyebrow="Workspace / Observability" title="Pulse" description="Current metric readings from the backend telemetry store." />
-    <div className="callout" style={{marginBottom:17}}><strong>Signal source: {data.mode}.</strong> ReplayLab changes these readings through the same ingestion and detection API.</div>
+    <div className="callout block-gap"><strong>Signal source: {data.mode}.</strong> ReplayLab changes these readings through the same ingestion and detection API.</div>
     <div className="grid grid-3">{sections.map(section => {
       const items = data.items.filter(item => item.name.startsWith(section.prefix));
       return <Panel key={section.title} title={section.title} detail={`${items.length} signals`}>
