@@ -1,5 +1,8 @@
-from dataclasses import dataclass, field, replace
 from enum import Enum
+from typing import Any
+
+from pydantic import BaseModel, ConfigDict, Field
+
 
 class Technology(str, Enum):
     hdfs = "HDFS"
@@ -10,38 +13,78 @@ class Technology(str, Enum):
     api = "API"
     unknown = "Unknown"
 
-@dataclass
-class IncidentRequest:
-    description: str
-    logs: str = ""
-    metrics: dict[str, float | int | str] = field(default_factory=dict)
 
-@dataclass
-class Evidence:
+class Severity(str, Enum):
+    p1 = "P1"
+    p2 = "P2"
+    p3 = "P3"
+    p4 = "P4"
+
+
+class IncidentRequest(BaseModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
+
+    description: str = Field(min_length=1, max_length=10_000)
+    logs: str = Field(default="", max_length=100_000)
+    metrics: dict[str, float | int | str] = Field(default_factory=dict)
+    environment: str = Field(default="demo", max_length=100)
+    tenant_id: str = Field(default="demo", max_length=100)
+
+
+class Evidence(BaseModel):
+    id: str
     source: str
+    kind: str = "runbook"
     snippet: str
-    score: float
+    score: float = Field(ge=0, le=1)
+    observed_at: str | None = None
 
-    def model_copy(self, update: dict | None = None) -> "Evidence":
-        return replace(self, **(update or {}))
 
-@dataclass
-class RecoveryAction:
+class RecoveryAction(BaseModel):
+    id: str
     action: str
     rationale: str
+    risk: str = "low"
     dangerous: bool = False
     requires_approval: bool = False
+    status: str = "proposed"
 
-    def model_copy(self, update: dict | None = None) -> "RecoveryAction":
-        return replace(self, **(update or {}))
 
-@dataclass
-class IncidentResponse:
+class IncidentResponse(BaseModel):
+    incident_id: str
+    status: str = "investigating"
     technology: Technology
-    confidence: float
+    severity: Severity = Severity.p3
+    confidence: float = Field(ge=0, le=1)
+    environment: str = "demo"
+    tenant_id: str = "demo"
     likely_root_causes: list[str]
     evidence: list[Evidence]
     recovery_actions: list[RecoveryAction]
     approval_required: bool
+    affected_entities: list[str] = Field(default_factory=list)
+    timeline: list[dict[str, Any]] = Field(default_factory=list)
     engineering_report: str
     executive_summary: str
+
+
+class Signal(BaseModel):
+    id: str
+    source: str
+    entity: str
+    kind: str
+    message: str
+    observed_at: str
+    severity: Severity = Severity.p3
+    value: float | int | str | None = None
+
+
+class ApprovalDecision(BaseModel):
+    decision: str = Field(pattern="^(approve|reject)$")
+    decided_by: str = Field(min_length=1, max_length=200)
+    reason: str = Field(default="", max_length=2000)
+
+
+class VerificationRequest(BaseModel):
+    checks: dict[str, float | int | str | bool]
+    verified_by: str = Field(default="system", max_length=200)

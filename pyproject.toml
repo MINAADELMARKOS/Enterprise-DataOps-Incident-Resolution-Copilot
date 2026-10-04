@@ -1,7 +1,7 @@
 [project]
-name = "enterprise-dataops-incident-resolution-copilot"
-version = "0.1.0"
-description = "Agentic DataOps incident resolution copilot with safety controls"
+name = "investinator"
+version = "0.2.0"
+description = "Evidence-first DataOps observability, investigation, and controlled remediation platform"
 requires-python = ">=3.11"
 dependencies = [
   "fastapi>=0.110",

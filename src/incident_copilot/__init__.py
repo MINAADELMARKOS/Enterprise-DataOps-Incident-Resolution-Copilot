@@ -1,1 +1,1 @@
-"""Enterprise DataOps Incident Resolution Copilot."""
+"""InvestiNator DataOps observability and incident-resolution platform."""
