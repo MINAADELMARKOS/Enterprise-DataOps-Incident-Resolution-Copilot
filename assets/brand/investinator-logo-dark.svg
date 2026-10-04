@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 58" role="img" aria-labelledby="title">
+  <title id="title">InvestiNator logo for dark backgrounds</title>
+  <rect width="300" height="58" rx="8" fill="#08111F"/>
+  <circle cx="27" cy="27" r="14" fill="none" stroke="#3CE6C1" stroke-width="3"/>
+  <path d="m37 37 11 11" stroke="#3CE6C1" stroke-width="3" stroke-linecap="round"/>
+  <path d="M13 27h8l3-6 5 12 3-6h9" fill="none" stroke="#F4F7FB" stroke-width="2.5"/>
+  <text x="62" y="35" fill="#F4F7FB" font-family="Inter, Arial, sans-serif" font-weight="700" font-size="26">InvestiNator</text>
+</svg>

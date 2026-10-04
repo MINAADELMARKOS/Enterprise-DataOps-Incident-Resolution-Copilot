@@ -11,6 +11,7 @@ class Technology(str, Enum):
     kudu = "Kudu"
     nifi = "NiFi"
     api = "API"
+    data = "Data"
     unknown = "Unknown"
 
 
@@ -88,3 +89,23 @@ class ApprovalDecision(BaseModel):
 class VerificationRequest(BaseModel):
     checks: dict[str, float | int | str | bool]
     verified_by: str = Field(default="system", max_length=200)
+
+
+class MetricInput(BaseModel):
+    entity_id: str = Field(min_length=1, max_length=200)
+    name: str = Field(min_length=1, max_length=150)
+    value: float
+    unit: str = Field(default="", max_length=30)
+    observed_at: str | None = None
+    labels: dict[str, str] = Field(default_factory=dict)
+
+
+class ReplayStart(BaseModel):
+    scenario: str
+
+
+class ChatMessage(BaseModel):
+    conversation_id: str | None = None
+    incident_id: str | None = None
+    mode: str = Field(default="investigate", pattern="^(ask|investigate|fix)$")
+    message: str = Field(min_length=1, max_length=4000)

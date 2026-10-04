@@ -3,8 +3,14 @@ import re
 from datetime import datetime, timezone
 
 from .safety import redact_sensitive, requires_approval
-from .schemas import Evidence, IncidentRequest, IncidentResponse, RecoveryAction, Severity, Technology
-
+from .schemas import (
+    Evidence,
+    IncidentRequest,
+    IncidentResponse,
+    RecoveryAction,
+    Severity,
+    Technology,
+)
 
 RUNBOOKS = [
     (Technology.kafka, "runbooks/kafka_disk_pressure.md", "Kafka DiskErrorException commonly indicates broker volume pressure or failed log directory.", 0.92),
@@ -13,6 +19,7 @@ RUNBOOKS = [
     (Technology.nifi, "runbooks/nifi_backpressure.md", "NiFi queues applying backpressure can stop upstream processors and increase flow-file age.", 0.83),
     (Technology.kudu, "runbooks/kudu_tablet_unavailable.md", "Kudu tablet unavailable errors require checking tablet-server health and consensus state.", 0.82),
     (Technology.api, "runbooks/api_5xx.md", "API 5xx spikes should be correlated with dependency latency and recent deployments.", 0.80),
+    (Technology.data, "runbooks/data_freshness.md", "Dataset freshness failure can occur while infrastructure is healthy; inspect record arrival, upstream lag and ingestion checkpoints.", 0.87),
 ]
 
 KEYWORDS = {
@@ -22,6 +29,7 @@ KEYWORDS = {
     Technology.nifi: ("nifi", "processor", "flowfile", "backpressure"),
     Technology.kudu: ("kudu", "tablet", "tserver", "consensus"),
     Technology.api: ("api", "http", "5xx", "gateway", "timeout"),
+    Technology.data: ("dataset", "freshness", "schema drift", "missing partition", "null rate"),
 }
 
 
@@ -38,11 +46,12 @@ def analyze_logs(logs: str) -> list[str]:
 
 
 def retrieve(technology: Technology, text: str) -> list[Evidence]:
-    terms = set(re.findall(r"[a-z0-9_]+", text.lower()))
+    terms = {term for term in re.findall(r"[a-z0-9_]+", text.lower()) if len(term) >= 4}
     ranked: list[Evidence] = []
     for index, (tech, source, snippet, base_score) in enumerate(RUNBOOKS, start=1):
-        overlap = sum(1 for term in terms if term in snippet.lower() or term in source.lower())
-        if tech is technology or overlap:
+        candidate_terms = set(re.findall(r"[a-z0-9_]+", f"{snippet} {source}".lower()))
+        overlap = len(terms & candidate_terms)
+        if tech is technology or (technology is Technology.unknown and overlap >= 2):
             ranked.append(Evidence(id=f"KB-{index:03d}", source=source, snippet=snippet,
                                    score=min(0.99, base_score + overlap * 0.01)))
     return sorted(ranked, key=lambda evidence: evidence.score, reverse=True)[:5]
@@ -104,7 +113,7 @@ def run_workflow(request: IncidentRequest) -> IncidentResponse:
     now = datetime.now(timezone.utc).isoformat()
     incident_id = "INC-" + hashlib.sha256(f"{request.tenant_id}:{text}".encode()).hexdigest()[:8].upper()
     severity = _severity(technology, text, request.metrics)
-    entities = []
+    entities: list[str] = []
     for entity in re.findall(r"\b(?:broker[-_ ]?\d+|[a-z][a-z0-9_.-]*(?:topic|job|table|dataset))\b", text, re.I):
         if entity.lower() not in {e.lower() for e in entities}:
             entities.append(entity)

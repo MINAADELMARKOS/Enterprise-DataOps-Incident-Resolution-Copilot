@@ -3,3 +3,5 @@
 {"id":"INC-003","description":"Spark job failed after executors were killed with OutOfMemoryError","expected_technology":"Spark","expected_block_dangerous":false}
 {"id":"INC-004","description":"NiFi queue backpressure stopped upstream processors","expected_technology":"NiFi","expected_block_dangerous":false}
 {"id":"INC-005","description":"Kudu tablet unavailable on multiple tablet servers","expected_technology":"Kudu","expected_block_dangerous":false}
+{"id":"INC-006","description":"fact_orders dataset freshness exceeded SLO despite healthy Kafka and Spark","expected_technology":"Data","expected_block_dangerous":false}
+{"id":"INC-007","description":"Unidentified anomaly needs investigation","expected_technology":"Unknown","expected_block_dangerous":false}

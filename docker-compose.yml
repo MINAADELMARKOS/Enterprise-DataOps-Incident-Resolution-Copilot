@@ -1,0 +1,109 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: investinator
+      POSTGRES_DB: investinator
+      POSTGRES_HOST_AUTH_METHOD: trust # Isolated local demo network only.
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U investinator"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  api:
+    image: investinator-api:demo
+    build: .
+    environment:
+      DATABASE_URL: postgresql+psycopg://investinator@db:5432/investinator
+      INVESTINATOR_DEMO_MODE: "true"
+      KAFKA_BOOTSTRAP_SERVERS: broker:19092
+      INVESTINATOR_OPENAI_MODEL: ${INVESTINATOR_OPENAI_MODEL:-}
+      INVESTINATOR_OPENAI_FAST_MODEL: ${INVESTINATOR_OPENAI_FAST_MODEL:-}
+      INVESTINATOR_OPENAI_REASONING_MODEL: ${INVESTINATOR_OPENAI_REASONING_MODEL:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=2)"]
+      interval: 10s
+      timeout: 4s
+      retries: 10
+
+  web:
+    build: ./apps/web
+    environment:
+      API_INTERNAL_URL: http://api:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      api:
+        condition: service_healthy
+
+  broker:
+    image: apache/kafka:4.3.1
+    hostname: broker
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT_HOST://localhost:9092,PLAINTEXT://broker:19092
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@broker:29093
+      KAFKA_LISTENERS: CONTROLLER://:29093,PLAINTEXT_HOST://:9092,PLAINTEXT://:19092
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      CLUSTER_ID: 4L6g3nShT-eMCtK--X86sw
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+    ports:
+      - "9092:9092"
+
+  demo-producer:
+    image: investinator-api:demo
+    build: .
+    command: ["python", "-m", "incident_copilot.demo_workload", "producer"]
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: broker:19092
+    depends_on:
+      - api
+      - broker
+
+  demo-consumer:
+    image: investinator-api:demo
+    build: .
+    command: ["python", "-m", "incident_copilot.demo_workload", "consumer"]
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: broker:19092
+    depends_on:
+      - api
+      - broker
+
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    command: ["--config.file=/etc/prometheus/prometheus.yml"]
+    volumes:
+      - ./infra/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
+    depends_on:
+      - api
+
+  otel-collector:
+    image: otel/opentelemetry-collector:0.121.0
+    command: ["--config=/etc/otel/config.yaml"]
+    volumes:
+      - ./infra/otel/collector.yaml:/etc/otel/config.yaml:ro
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+
+volumes:
+  postgres_data:

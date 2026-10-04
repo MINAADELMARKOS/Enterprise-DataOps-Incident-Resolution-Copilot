@@ -1,77 +1,30 @@
-# InvestiNator architecture and delivery plan
+# InvestiNator architecture
 
-## Product shape
+The local demo has FastAPI, Next.js, PostgreSQL, a Kafka producer and consumer, Prometheus, and an OpenTelemetry collector. ReplayLab injects **simulated fault telemetry** through the metric and incident workflow. The Kafka workload itself is real; the injected broker fault is not.
 
-InvestiNator covers the operational loop:
-
-```text
-Observe → Detect → Correlate → Investigate → Explain → Recommend
-       → Approve / Execute → Verify → Learn
+```mermaid
+flowchart LR
+  Producer --> Kafka --> Consumer
+  ReplayLab --> Ingest[Telemetry ingestion]
+  Ingest --> Rules[Threshold rules]
+  Rules --> Correlate[Topology correlation]
+  Correlate --> DB[(PostgreSQL)]
+  DB --> API[FastAPI]
+  API --> UI[Next.js]
+  API --> Tools[Read-only tools]
+  Tools --> AI[Optional OpenAI Responses]
+  API --> Policy[Policy and approval]
+  Policy --> Demo[Allowlisted demo recovery]
+  Demo --> Verify[Metric verification]
+  Verify --> DB
+  API --> Prometheus
+  API --> OTel[OpenTelemetry collector]
 ```
 
-The target product has eight capabilities: Pulse (observability), Investigator (Ask / Investigate / Fix), NerveMap (infrastructure and data lineage), Incident Room, EvidenceGraph, Fix (controlled remediation), Memory (runbooks and incident knowledge), and ReplayLab (simulation and evaluation). The current repository establishes backend contracts and an order-pipeline seed, not a complete production implementation of all eight.
+SQLAlchemy tables hold incidents, alerts, telemetry, topology, approvals, audit events, replay runs, conversations, knowledge, AI usage, and evaluations. Alembic owns the schema. Data queries filter by the server-derived demo tenant. The client-supplied `tenant_id` on the compatibility endpoint is overridden. Production identity and tenant provisioning are absent.
 
-## Architecture boundary
+The incident states include `investigating`, `resolved`, and `closed_unresolved` after a rejected demo action. Approval is a separate gate. Failed verification never closes an incident. The only write action simulates recovery for an active ReplayLab run; unknown action IDs and production commands are denied.
 
-```text
-Telemetry sources → OpenTelemetry / provider adapters → Detection
-                                                     ↓
-                              Correlation ← Topology / lineage
-                                    ↓
-                             Incident API
-                                    ↓
-                       Investigator / AI gateway
-                         ↓ typed read-only tools
-             Evidence + retrieval + incident memory
-                                    ↓
-                    Policy → approval → executor
-                                    ↓
-                         verification / audit
-```
+Telemetry observations and runbook suggestions have distinct source and kind fields. Deterministic rules create hypotheses only when evidence exists; otherwise they emit `insufficient_evidence`. The optional model receives bounded, redacted evidence and read-only tool results. A structured response must cite known evidence IDs. Model output never authorizes remediation. See [AI design](ai-design.md) and [security](security.md).
 
-FastAPI is the current API boundary. `agents.py` is the deterministic V0 investigation orchestrator; it classifies known DataOps technologies, extracts log signatures, retrieves runbook evidence, and proposes typed next steps. The API currently keeps incidents and audit events in process memory. The seed NerveMap graph is illustrative. Connectors, a durable database, identity, and the AI gateway are future integrations.
-
-## Evidence and safety contracts
-
-- Observations (logs and metrics) and runbook guidance have separate `kind` and source fields.
-- Each evidence item has a stable response-local ID so a hypothesis can point back to its supporting material.
-- Unknown or weakly classified reports return `insufficient_evidence`.
-- GPT/model output cannot authorize an operation. Risk is determined by application policy and typed action metadata.
-- Approval records a human decision; it does not execute an action. Execution remains disabled until an allowlisted runner, preconditions, rollback, and authorization exist.
-- Verification checks symptom values; successful command completion alone is not incident resolution.
-- Tenant IDs are carried and filtered in the demo. Production must authenticate the caller and enforce tenant/resource scope before fetching telemetry, retrieval content, or model context.
-
-## First vertical slice
-
-Target Kafka + Spark order flow:
-
-```text
-Orders Producer → Kafka topic → Spark streaming job → fact_orders → dashboard
-```
-
-The first live scenario is broker disk pressure. It should connect real telemetry, detect and correlate disk/log/ISR/lag/freshness signals, gather evidence through read-only tools, produce a reviewable RCA and blast radius, request human approval for a named runbook, execute only approved steps, verify recovery metrics, and retain the postmortem. The current seed graph, incident analysis endpoint, approval records, and verification contract are scaffolding toward that demo.
-
-## Delivery sequence
-
-| Stage | Outcome | Status in this repository |
-| --- | --- | --- |
-| V0.2 | Structured incident contracts and InvestiNator identity | Implemented with deterministic fallback |
-| V0.3 | OpenTelemetry, Prometheus, real Kafka/Spark telemetry | Planned; connectors are not configured |
-| V0.4 | Pulse dashboard and incident engine | API surface seeded; live health/dashboard pending |
-| V0.5 | Investigator with read-only tools | Investigation API exists; provider tools pending |
-| V0.6 | RAG and historical incident memory | Static runbook evidence remains; durable RAG pending |
-| V0.7 | NerveMap topology and blast radius | Illustrative graph only |
-| V0.8 | ReplayLab and automated evaluation | Existing JSONL cases remain the initial dataset |
-| V0.9 | Policy, approvals, controlled remediation | Policy proposals and approval records exist; executor pending |
-| V1.0 | Verified Kafka/Spark end-to-end demo | Pending real telemetry, execution, persistence, and integration |
-| V1.1–V1.3 | Additional platforms, data quality, enterprise tenancy | Planned |
-
-## Suggested next implementation milestones
-
-1. Add a real OpenTelemetry/Prometheus ingestion adapter and Kafka/Spark telemetry fixtures for repeatable local development.
-2. Move incident and audit state into PostgreSQL with tenant-scoped repository methods and migrations.
-3. Add authenticated OIDC identity and RBAC before enabling any retrieval or tools outside the demo.
-4. Build the tool registry and OpenAI Responses API gateway behind a provider interface; emit validated Pydantic outputs and usage/latency traces.
-5. Add topology-aware alert correlation and lineage ingestion.
-6. Add replay scenarios and evaluation for detection, evidence support, unsafe-action blocking, and verification.
-7. Implement named, allowlisted runbooks with preconditions, rollback, approval binding, and recovery verification before any production executor.
+The stack does not connect to production Kafka, Spark, HDFS, NiFi, Kudu, a data catalog, or an enterprise identity system. The Kafka health adapter is read-only. Live platform adapters, real lineage discovery, OIDC/RBAC, retrieval indexing, and production runbook execution remain future work.

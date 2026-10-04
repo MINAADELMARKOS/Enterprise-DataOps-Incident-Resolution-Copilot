@@ -1,1 +1,11 @@
 __pycache__/
+.venv/
+.env
+*.db
+*.sqlite3
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+apps/web/node_modules/
+apps/web/.next/
+src/*.egg-info/

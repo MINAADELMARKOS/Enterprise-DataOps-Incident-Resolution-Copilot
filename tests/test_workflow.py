@@ -1,6 +1,6 @@
 from incident_copilot.agents import run_workflow
-from incident_copilot.schemas import IncidentRequest, Technology
 from incident_copilot.safety import redact_sensitive
+from incident_copilot.schemas import IncidentRequest, Technology
 
 
 def test_kafka_incident_requires_approval_for_restart():

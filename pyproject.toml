@@ -1,17 +1,34 @@
 [project]
 name = "investinator"
-version = "0.2.0"
+version = "0.3.0"
 description = "Evidence-first DataOps observability, investigation, and controlled remediation platform"
 requires-python = ">=3.11"
 dependencies = [
   "fastapi>=0.110",
   "uvicorn>=0.29",
   "pydantic>=2.6",
+  "sqlalchemy>=2.0",
+  "psycopg[binary]>=3.1",
+  "alembic>=1.13",
+  "openai>=2.0",
+  "httpx>=0.27",
+  "kafka-python>=2.2",
+  "opentelemetry-sdk>=1.30",
+  "opentelemetry-exporter-otlp-proto-http>=1.30",
+  "opentelemetry-instrumentation-fastapi>=0.51b0",
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8.0", "httpx>=0.27"]
+dev = ["pytest>=8.0", "ruff>=0.6", "mypy>=1.11"]
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 testpaths = ["tests"]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I", "B"]
+ignore = ["B008"] # FastAPI dependency injection uses Depends in parameter defaults.
+
+[[tool.mypy.overrides]]
+module = ["kafka", "kafka.*"]
+ignore_missing_imports = true

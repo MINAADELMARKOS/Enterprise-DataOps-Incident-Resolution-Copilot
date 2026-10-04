@@ -1,0 +1,9 @@
+# AI investigation design
+
+The Investigator always has a deterministic fallback. With `OPENAI_API_KEY` and `INVESTINATOR_OPENAI_MODEL`, the API uses the OpenAI Responses API structured parser to request a typed `InvestigationAnalysis`. `INVESTINATOR_OPENAI_FAST_MODEL` and `INVESTINATOR_OPENAI_REASONING_MODEL` can route fast or high-severity work; the normal investigation path currently chooses the configured reasoning model for P1/P2 and the default model otherwise. No model name or credentials are embedded in source.
+
+The model sees a bounded incident snapshot: technology, severity, affected entities, up to 20 evidence items, one allowlisted current metric lookup, and matching knowledge. The prompt treats all incident text and retrieved content as untrusted. The gateway rejects root-cause candidates with missing or unknown evidence IDs. Failures return a clearly marked fallback with uncertainty. The gateway records model, task, latency, token counts, and failure type in `AIUsageRow`; it does not store raw prompts in usage rows. `INVESTINATOR_OPENAI_STORE` defaults to false.
+
+The read-only tool registry is in `tools.py`. It restricts names and arguments to current metrics, knowledge search, and blast radius. The policy engine runs outside the model; an AI answer cannot grant action approval or call a production executor. The only allowed write in this repository is a named ReplayLab simulation after a stored human decision.
+
+The offline evaluator in `evaluation.py` checks deterministic classification, evidence or explicit uncertainty, and approval gating on the JSONL fixture set. Its pass rate is a regression result for those fixtures, not a measure of general model quality. Future evaluation should add labeled live incidents, citation support checks, tool-call accuracy, retrieval relevance, cost and latency limits, prompt-injection trials, and human review.
