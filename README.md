@@ -20,6 +20,8 @@ InvestiNator follows a signal across infrastructure, pipelines, and datasets, ga
 
 The dark interface uses a shared [cyberpunk design system](docs/design-system.md) with accessible neon controls, terminal panels, and responsive layouts.
 
+Explore the [public GitHub Pages UI preview](https://minaadelmarkos.github.io/Enterprise-DataOps-Incident-Resolution-Copilot/) with synthetic data, or follow the [detailed user guide](docs/user-guide.md) to run the complete API-backed demo locally. The preview source and deployment workflow live in `apps/showcase` and `.github/workflows/pages.yml`.
+
 ## Run the full demo
 
 Requires Docker Desktop with its engine running. From the repository root:

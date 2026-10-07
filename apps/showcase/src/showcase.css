@@ -1,0 +1,60 @@
+.preview-banner {
+  margin-bottom: 24px;
+  padding: 11px 15px;
+  border: 1px solid #00d4ff66;
+  background: #00d4ff0c;
+  clip-path: var(--clip-control);
+  color: var(--muted);
+  font: 12px/1.6 var(--font-body);
+}
+.preview-banner span {
+  color: var(--blue);
+  font-family: var(--font-label);
+  letter-spacing: 0.12em;
+}
+.preview-banner a {
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.preview-banner a:hover {
+  text-shadow: 0 0 10px #00ff8888;
+}
+.panel-body > p:first-child {
+  margin-top: 0;
+}
+.panel-body > p:last-child {
+  margin-bottom: 0;
+}
+.panel-body .table-link {
+  display: inline-block;
+  margin-top: 12px;
+}
+.panel-body .button-row + p {
+  margin-top: 15px;
+}
+.scenario-card {
+  display: flex;
+  flex-direction: column;
+}
+.scenario-card .top-gap {
+  margin-top: auto;
+  padding-top: 20px;
+}
+.chat-bubble .small {
+  margin-bottom: 6px;
+}
+.topology-toolbar .button {
+  min-width: 44px;
+}
+.page-heading .badge {
+  align-self: flex-start;
+}
+@media (max-width: 650px) {
+  .preview-banner {
+    margin-bottom: 20px;
+  }
+  .scenario-card .top-gap .button {
+    width: 100%;
+  }
+}

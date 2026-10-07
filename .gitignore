@@ -8,4 +8,6 @@ __pycache__/
 .mypy_cache/
 apps/web/node_modules/
 apps/web/.next/
+apps/showcase/node_modules/
+apps/showcase/dist/
 src/*.egg-info/
